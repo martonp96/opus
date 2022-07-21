@@ -10,6 +10,8 @@ on:
 jobs:
   Release:
     runs-on: ubuntu-latest
+    outputs:
+      url: ${{ steps.create_release.outputs.upload_url }}
     steps:
       - name: Create Release
         id: create_release
@@ -76,7 +78,7 @@ jobs:
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ needs.Release.steps.create_release.outputs.upload_url }}
+          upload_url: ${{ needs.Release.outputs.url }}
           asset_path: ./build/${{ matrix.config.config }}
           asset_name: ${{ matrix.config.config }}
           asset_content_type: application/octet-stream
