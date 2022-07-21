@@ -55,7 +55,7 @@ jobs:
         working-directory: ./build
         run: cmake --build . -j 2 --config ${{ matrix.config.config }} --target package
 
-  CMakeBuild:
+  Release:
     needs: CMakeBuild
     runs-on: ubuntu-latest
     steps:
