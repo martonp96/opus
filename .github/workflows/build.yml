@@ -79,6 +79,6 @@ jobs:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
           upload_url: ${{ needs.Release.outputs.url }}
-          asset_path: ./build/${{ matrix.config.config }}
-          asset_name: ${{ matrix.config.config }}
+          asset_path: ./build/${{ matrix.config.output }}
+          asset_name: ${{ matrix.config.output }}
           asset_content_type: application/octet-stream
