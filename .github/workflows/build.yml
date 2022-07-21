@@ -8,7 +8,20 @@ on:
       - 'v*'
 
 jobs:
+  Release:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: ${{ github.ref }}
+          release_name: Release ${{ github.ref }}
+
   CMakeBuild:
+    needs: Release
     name: CMake/${{ matrix.config.name }}
     runs-on: ${{ matrix.config.os }}
     strategy:
@@ -19,19 +32,22 @@ jobs:
             name: "Windows/Lib/X64/Release",
             os: windows-latest,
             config: Release,
-            args: -G "Visual Studio 17 2022" -A Win32
+            args: -G "Visual Studio 17 2022" -A Win32,
+            output: "Opus-1.3-win32.tar.gz"
           }
         - {
             name: "Linux/Lib/X64/Release",
             os: ubuntu-latest,
             config: Release,
-            args: ""
+            args: "",
+            output: "Opus-1.3-Linux.tar.gz"
           }
         - {
             name: "MacOSX/Lib/X64/Release",
             os: macos-latest,
             config: Release,
-            args: ""
+            args: "",
+            output: "Opus-1.3-Darwin.tar.gz"
           }
     steps:
       - uses: actions/checkout@v2
@@ -55,45 +71,12 @@ jobs:
         working-directory: ./build
         run: cmake --build . -j 2 --config ${{ matrix.config.config }} --target package
 
-  Release:
-    needs: CMakeBuild
-    runs-on: ubuntu-latest
-    steps:
-      - name: Create Release
-        id: create_release
-        uses: actions/create-release@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          tag_name: ${{ github.ref }}
-          release_name: Release ${{ github.ref }}
-
-      - name: Upload windows binaries
+      - name: Upload library
         uses: actions/upload-release-asset@v1
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/Opus-1.3-win32.tar.gz
-          asset_name: Opus-1.3-win32.tar.gz
-          asset_content_type: application/octet-stream
-
-      - name: Upload linux binaries
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/Opus-1.3-Linux.tar.gz
-          asset_name: Opus-1.3-Linux.tar.gz
-          asset_content_type: application/octet-stream
-
-      - name: Upload macos binaries
-        uses: actions/upload-release-asset@v1
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        with:
-          upload_url: ${{ steps.create_release.outputs.upload_url }}
-          asset_path: ./build/Opus-1.3-Darwin.tar.gz
-          asset_name: Opus-1.3-Darwin.tar.gz
+          upload_url: ${{ needs.Release.steps.create_release.outputs.upload_url }}
+          asset_path: ./build/${{ matrix.config.config }}
+          asset_name: ${{ matrix.config.config }}
           asset_content_type: application/octet-stream
