@@ -1,6 +1,11 @@
 name: Opus Build Matrix
 
-on: [push, pull_request]
+on:
+  push:
+    branches-ignore: 
+      - '**'
+    tags:
+      - 'b*'
 
 jobs:
   Release:
