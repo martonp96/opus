@@ -48,7 +48,8 @@ jobs:
             name: "Windows/Lib/armv8/Release",
             os: windows-latest,
             config: Release,
-            args: -G "Visual Studio 17 2022" -A ARM64
+            args: -G "Visual Studio 17 2022" -A ARM64,
+            output: "Opus-1.3-win64.tar.gz"
           }
     steps:
       - uses: actions/checkout@v2
