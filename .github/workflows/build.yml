@@ -45,11 +45,10 @@ jobs:
             output: "Opus-1.3-Linux.tar.gz"
           }
         - {
-            name: "MacOSX/Lib/X64/Release",
-            os: macos-latest,
+            name: "Windows/Lib/armv8/Release",
+            os: windows-latest,
             config: Release,
-            args: "",
-            output: "Opus-1.3-Darwin.tar.gz"
+            args: -G "Visual Studio 17 2022" -A ARM64
           }
     steps:
       - uses: actions/checkout@v2
